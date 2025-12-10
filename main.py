@@ -5,25 +5,31 @@ from rotation_matrixes import *
 from scipy.spatial.transform import Rotation as R
 
 def w(t):
-    return np.array([0,0,1])
+    return np.array([1,1,0])
 
 airplane_0 = A_z(90) @ airplane
 
 delta_t = 0.1
-draw(airplane_0)
-plt.waitforbuttonpress()
 
-A_i = np.eye(3)
 t_i = 0
-for i in range(100):
-    [p, q, r] = w(t_i)
-    Omega = np.array([[ 0, -r,  q],
-                      [ r,  0, -p],
-                      [-q,  p,  0]])
-    A_i_dot = Omega @ A_i
-    t_i += delta_t
-    A_i += A_i_dot * delta_t
-    print(f"t: {t_i}, det: {np.linalg.det(A_i)}")
+phi_i = 0
+psi_i = 0
+tetta_i = np.pi/2
+A_i = A_z(np.degrees(psi_i)) @ A_x(np.degrees(tetta_i)) @ A_z(np.degrees(phi_i))
+airplane_i = A_i @ airplane_0
+draw(airplane_i)
+plt.waitforbuttonpress()
+for i in range(100000):
+    A_i = A_z(np.degrees(psi_i)) @ A_x(np.degrees(tetta_i)) @ A_z(np.degrees(phi_i))
+    [p, q, r] = A_i.T @ w(t_i)
+    print(np.degrees(psi_i),np.degrees(tetta_i),np.degrees(phi_i))
+    tetta_i_dot = p * np.cos(phi_i) - q * np.sin(phi_i)
+    psi_i_dot = (1/np.sin(tetta_i))*(p*np.sin(phi_i)+q*np.cos(phi_i))
+    phi_i_dot = r - (1/np.tan(tetta_i))*(p*np.sin(phi_i)+q*np.cos(phi_i))
+    psi_i += psi_i_dot * delta_t
+    tetta_i += tetta_i_dot * delta_t
+    phi_i += phi_i_dot * delta_t
+    A_i = A_z(np.degrees(psi_i)) @ A_x(np.degrees(tetta_i)) @ A_z(np.degrees(phi_i))
     airplane_i = A_i @ airplane_0
     draw(airplane_i)
     plt.waitforbuttonpress()
