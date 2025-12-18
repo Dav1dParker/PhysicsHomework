@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 from airplane import *
 from rotation_matrixes import *
-from scipy.spatial.transform import Rotation as R
+
 
 def w(t):
     return np.array([1,1,0])
